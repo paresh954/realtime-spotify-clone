@@ -1,7 +1,7 @@
 import TopBar from "@/components/Topbar";
 import { useChatStore } from "@/stores/useChatStore";
 import { useUser } from "@clerk/clerk-react";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import UserList from "./components/UserList";
 import ChatHeader from "./components/ChatHeader";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -19,6 +19,14 @@ const formatTime = (date: string) => {
 const ChatPage = () => {
   const { user } = useUser();
   const { messages, selectedUser, fetchMessages, fetchUsers } = useChatStore();
+
+  const messageEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (messageEndRef.current && messages) {
+      messageEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
 
   useEffect(() => {
     if (user) fetchUsers();
@@ -48,6 +56,7 @@ const ChatPage = () => {
                       className={`flex items-start gap-3 ${
                         message.senderId === user?.id ? "flex-row-reverse" : ""
                       } `}
+                      ref={messageEndRef}
                     >
                       <Avatar className="size-8">
                         <AvatarImage
